@@ -20,21 +20,22 @@ RUN git clone https://github.com/torch/distro.git /torch --recursive \
     && cd / \
     && rm -rf /torch
 
-# Set the environment variables
+# Set environment variables
 ENV PATH="/root/torch/install/bin:${PATH}"
 ENV LUA_PATH="/root/torch/install/share/lua/5.1/?.lua;;"
 ENV LUA_CPATH="/root/torch/install/lib/lua/5.1/?.so;;"
 
+# Create directories
+RUN mkdir -p /app/uploads
+
 # Set the working directory
 WORKDIR /app
 
-# Copy the application files
+# Copy application files
 COPY . /app
 
-# Install Torch dependencies
-RUN luarocks install torch \
-    && luarocks install nn \
-    && luarocks install image
+# Install LuaRocks packages
+RUN luarocks install lapis torch nn image
 
 # Command to run the application
-CMD ["th", "app.lua"]
+CMD ["lapis", "server"]
