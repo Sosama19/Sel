@@ -1,1 +1,2 @@
-web: th app.lua
+web: lapis server
+
