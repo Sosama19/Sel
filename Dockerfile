@@ -1,4 +1,4 @@
-# Use a base image with Lua and Torch installed
+# Use an official Ubuntu base image
 FROM ubuntu:20.04
 
 # Install dependencies
@@ -8,14 +8,22 @@ RUN apt-get update && apt-get install -y \
     git \
     build-essential \
     lua5.1 \
+    luarocks \
     libtorch-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Torch
-RUN wget http://torch.ch/extra/cutorch-1.0.0-py2.7-linux-x86_64.tar.gz \
-    && tar -xvf cutorch-1.0.0-py2.7-linux-x86_64.tar.gz \
-    && cp -r cutorch /usr/local/share/torch/ \
-    && rm cutorch-1.0.0-py2.7-linux-x86_64.tar.gz
+RUN git clone https://github.com/torch/distro.git /torch --recursive \
+    && cd /torch \
+    && bash install-deps \
+    && ./install.sh \
+    && cd / \
+    && rm -rf /torch
+
+# Set the environment variables
+ENV PATH="/root/torch/install/bin:${PATH}"
+ENV LUA_PATH="/root/torch/install/share/lua/5.1/?.lua;;"
+ENV LUA_CPATH="/root/torch/install/lib/lua/5.1/?.so;;"
 
 # Set the working directory
 WORKDIR /app
